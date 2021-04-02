@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode/generate.dart';
-import 'package:qrcode/scan.dart';
+import 'package:Qrcode/drawer.dart';
+import 'package:Qrcode/generate.dart';
+import 'package:Qrcode/scan.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,12 +9,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text("QR & Bar Code"),
-        centerTitle: true,
+        title: Text('QR & Barcode Generator Scanner'),
+        leading: IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => _scaffoldKey.currentState.openDrawer(),),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -25,7 +31,9 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             Image(image: AssetImage("assets/homepage.jpg")),
             flatButton("Scan QR CODE", ScanPage()),
-            SizedBox(height: 20.0,),
+            SizedBox(
+              height: 20.0,
+            ),
             flatButton("Generate QR CODE", GeneratePage()),
           ],
         ),
@@ -42,10 +50,10 @@ class _HomePageState extends State<HomePage> {
       },
       child: Text(
         text,
-        style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),
+        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
       ),
       shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.blue,width: 3.0),
+          side: BorderSide(color: Colors.blue, width: 3.0),
           borderRadius: BorderRadius.circular(20.0)),
     );
   }

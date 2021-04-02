@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode/generate.dart';
-import 'package:qrcode/homePage.dart';
-import 'package:qrcode/scan.dart';
-import 'package:qrcode/share_service.dart';
+import 'package:pref/pref.dart';
+import 'package:Qrcode/generate.dart';
+import 'package:Qrcode/homePage.dart';
+import 'package:Qrcode/scan.dart';
+import 'package:Qrcode/share_service.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: MyApp(),
-    debugShowCheckedModeBanner: false,
-  ));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final service = await PrefServiceShared.init(
+    defaults: {
+      'start_page': 'posts',
+      'ui_theme': 'light',
+    },
+  );
+
+  runApp(
+    PrefService(
+      service: service,
+      child: MaterialApp(
+        home: MyApp(service: service),
+        debugShowCheckedModeBanner: false,
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
+  final dynamic service;
+  MyApp({this.service});
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -28,11 +44,13 @@ class _MyAppState extends State<MyApp> {
       ..getSharedData().then(_handleSharedData);
     ShareService().getSharedImage().then(_handleSharedImage);
   }
+
   void _handleSharedData(String sharedData) {
     setState(() {
       _sharedText = sharedData;
     });
   }
+
   void _handleSharedImage(dynamic sharedImage) {
     setState(() {
       _sharedImage = sharedImage;
@@ -41,6 +59,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return _sharedText != "" ? GeneratePage(sharedText: _sharedText) : _sharedImage != null ? ScanPage() : HomePage();
+    return _sharedText != ""
+        ? GeneratePage(
+            sharedText: _sharedText,
+          )
+        : _sharedImage != null
+            ? ScanPage(
+                sharedImage: _sharedImage,
+              )
+            : HomePage();
   }
 }

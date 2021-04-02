@@ -4,26 +4,40 @@ import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pref/pref.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image/image.dart' as im;
 import 'package:barcode_image/barcode_image.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class GeneratePage extends StatefulWidget {
-  final String sharedText;
+  final dynamic sharedText;
   GeneratePage({this.sharedText});
   @override
-  State<StatefulWidget> createState() => GeneratePageState();
+  _GeneratePageState createState() =>
+      _GeneratePageState(sharedText: sharedText);
 }
 
-class GeneratePageState extends State<GeneratePage> {
+class _GeneratePageState extends State<GeneratePage> {
+  String qrData = "https://kaditya97.com.np";
+  dynamic sharedText;
+  _GeneratePageState({this.sharedText});
   final _formKey = GlobalKey<FormState>();
   File myfile;
   double _panelHeightOpen;
   double _panelHeightClosed = 95.0;
   PanelController _pc = new PanelController();
-  // String _basename;
-  String dropdownValue = 'lulc';
+  String dropdownValue = 'qrCode';
+
+  @override
+  void initState() {
+    super.initState();
+    if (sharedText != null) {
+      setState(() {
+        qrData = sharedText.toString();
+      });
+    }
+  }
 
   void shareQrcode(
     Barcode bc,
@@ -48,7 +62,8 @@ class GeneratePageState extends State<GeneratePage> {
 
   @override
   Widget build(BuildContext context) {
-    String qrData = (widget.sharedText).toString();
+    final startPage = PrefService.of(context).get('start_page');
+    print(startPage);
     _panelHeightOpen = MediaQuery.of(context).size.height * .80;
     return Scaffold(
       appBar: AppBar(
@@ -96,43 +111,14 @@ class GeneratePageState extends State<GeneratePage> {
                 //   data: qrData,
                 // ),
                 SizedBox(
-                  height: 40.0,
+                  height: 10.0,
                 ),
                 Text(
-                  "New QR Link Generator",
-                  style: TextStyle(fontSize: 20.0),
+                  qrData,
+                  textAlign: TextAlign.center,
                 ),
-                TextField(
-                  controller: qrdataFeed..text = qrData,
-                  decoration: InputDecoration(
-                    hintText: "Input your link or data",
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
-                  child: FlatButton(
-                    padding: EdgeInsets.all(15.0),
-                    onPressed: () async {
-                      if (qrdataFeed.text.isEmpty) {
-                        //a little validation for the textfield
-                        setState(() {
-                          qrData = "";
-                        });
-                      } else {
-                        setState(() {
-                          qrData = qrdataFeed.text;
-                        });
-                      }
-                    },
-                    child: Text(
-                      "Generate QR",
-                      style: TextStyle(
-                          color: Colors.blue, fontWeight: FontWeight.bold),
-                    ),
-                    shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Colors.blue, width: 3.0),
-                        borderRadius: BorderRadius.circular(20.0)),
-                  ),
+                SizedBox(
+                  height: 20.0,
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
@@ -159,6 +145,34 @@ class GeneratePageState extends State<GeneratePage> {
                         ),
                         Text(
                           "Share QR",
+                          style: TextStyle(
+                              color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.blue, width: 3.0),
+                        borderRadius: BorderRadius.circular(20.0)),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
+                  child: FlatButton(
+                    padding: EdgeInsets.all(15.0),
+                    onPressed: () async {},
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.file_download,
+                          color: Colors.blue,
+                          size: 30.0,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Download",
                           style: TextStyle(
                               color: Colors.blue, fontWeight: FontWeight.bold),
                         ),
@@ -208,7 +222,7 @@ class GeneratePageState extends State<GeneratePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "QR and Bar Code Generator",
+                  "QR and Barcode Generator",
                   style: TextStyle(
                     fontWeight: FontWeight.normal,
                     fontSize: 24.0,
@@ -231,90 +245,169 @@ class GeneratePageState extends State<GeneratePage> {
   Widget _form() {
     return Form(
       key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: DropdownButton<String>(
-              value: dropdownValue,
-              icon: Icon(Icons.arrow_drop_down_outlined),
-              iconSize: 24,
-              elevation: 16,
-              style: TextStyle(color: Colors.deepPurple),
-              underline: Container(
-                height: 2,
-                color: Colors.deepPurpleAccent,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: DropdownButton<String>(
+                value: dropdownValue,
+                icon: Icon(Icons.arrow_drop_down_outlined),
+                iconSize: 24,
+                elevation: 16,
+                style: TextStyle(color: Colors.deepPurple),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurpleAccent,
+                ),
+                onChanged: (String newValue) {
+                  setState(() {
+                    dropdownValue = newValue;
+                  });
+                },
+                items: [
+                  DropdownMenuItem(
+                    child: Text("QR Code"),
+                    value: 'qrCode',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("QR Wifi"),
+                    value: 'qrWifi',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Code 39"),
+                    value: 'code39',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Code 93"),
+                    value: 'code 93',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Code 128A"),
+                    value: 'code128a',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Code 128B"),
+                    value: 'code128b',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Code 128C"),
+                    value: 'code128c',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("GS1-128"),
+                    value: 'gs1128',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("ITF"),
+                    value: 'itf',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("ITF-14"),
+                    value: 'itf14',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("ITF-16"),
+                    value: 'itf16',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("EAN 13"),
+                    value: 'ean13',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("EAN 8"),
+                    value: 'ean8',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("EAN 2"),
+                    value: 'ean2',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("EAN 5"),
+                    value: 'ean5',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("ISBN"),
+                    value: 'isbn',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("UPC-A"),
+                    value: 'upca',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("UPC-E"),
+                    value: 'upce',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Telepen"),
+                    value: 'telepen',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Codabar"),
+                    value: 'codabar',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("RM4SCC"),
+                    value: 'rm4scc',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("PDF417"),
+                    value: 'pdf417',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Data Matrix"),
+                    value: 'datamatrix',
+                  ),
+                  DropdownMenuItem(
+                    child: Text("Aztec"),
+                    value: 'aztec',
+                  ),
+                ],
               ),
-              onChanged: (String newValue) {
-                setState(() {
-                  dropdownValue = newValue;
-                });
-              },
-              items: [
-                DropdownMenuItem(
-                  child: Text("Land Cover"),
-                  value: 'lulc',
-                ),
-                DropdownMenuItem(
-                  child: Text("DEM"),
-                  value: 'dem',
-                ),
-                DropdownMenuItem(
-                  child: Text("NDVI"),
-                  value: 'ndvi',
-                ),
-                DropdownMenuItem(
-                  child: Text("NDBI"),
-                  value: 'ndbi',
-                ),
-                DropdownMenuItem(
-                  child: Text("NDWI"),
-                  value: 'ndwi',
-                ),
-                DropdownMenuItem(
-                  child: Text("Hillshade"),
-                  value: 'hillshade',
-                ),
-                DropdownMenuItem(
-                  child: Text("Slope"),
-                  value: 'slope',
-                ),
-                DropdownMenuItem(
-                  child: Text("Aspect"),
-                  value: 'aspect',
-                ),
-              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
-              onPressed: () async {
-                void sendData(String name, File file) async {
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('Processing Data')));
-                }
-
-                final String name = dropdownValue;
-                // if (filedata == null && dropdownValue == 'dem' ||
-                //     filedata == null && dropdownValue == 'lulc') {
-                //   final File file = null;
-                //   sendData(name, file);
-                // } else if (filedata == null) {
-                //   Scaffold.of(context).showSnackBar(
-                //       SnackBar(content: Text('Please Select a geojsonfile')));
-                // }
-                // if (filedata != null) {
-                //   final File file = filedata;
-                //   sendData(name, file);
-                // }
-              },
-              child: Text('Submit'),
+            TextField(
+              controller: qrdataFeed,
+              decoration: InputDecoration(
+                hintText: "Input your link or data",
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
+              child: FlatButton(
+                padding: EdgeInsets.all(15.0),
+                onPressed: () async {
+                  if (qrdataFeed.text.isEmpty) {
+                    //a little validation for the textfield
+                    setState(() {
+                      qrData = "";
+                    });
+                  } else {
+                    setState(() {
+                      qrData = qrdataFeed.text;
+                    });
+                  }
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  _pc.close();
+                },
+                child: Text(
+                  "Generate QR",
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(color: Colors.blue, width: 3.0),
+                    borderRadius: BorderRadius.circular(20.0)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

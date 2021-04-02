@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode/share_service.dart';
+import 'package:Qrcode/share_service.dart';
 
 void main() {
   runApp(MyApp());
