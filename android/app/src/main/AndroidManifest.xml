@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.qrcode">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
@@ -9,7 +10,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="qrcode"
+        android:label="Qrcode"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
+import 'package:qrcode/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/rendering.dart';
@@ -9,6 +11,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:image/image.dart' as im;
 import 'package:barcode_image/barcode_image.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:file_saver/file_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class GeneratePage extends StatefulWidget {
   final dynamic sharedText;
@@ -60,12 +64,30 @@ class _GeneratePageState extends State<GeneratePage> {
         sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
   }
 
+  Future<void> _downloadData() async {
+    final bc = Barcode.qrCode();
+    final image = im.Image(280, 240);
+    im.fill(image, im.getColor(255, 255, 255));
+    drawBarcode(image, bc, qrData, font: im.arial_48);
+    final data = im.encodePng(image);
+    Uint8List bytes = Uint8List.fromList(data);
+    MimeType type = MimeType.PNG;
+    if (Platform.isIOS || Platform.isAndroid) {
+      bool status = await Permission.storage.isGranted;
+      if (!status) await Permission.storage.request();
+    }
+    await FileSaver.instance.saveFile("myqr", bytes, "png", mimeType:type);
+    final snackBar = SnackBar(content: Text('Image Downloaded'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     final startPage = PrefService.of(context).get('start_page');
     print(startPage);
     _panelHeightOpen = MediaQuery.of(context).size.height * .80;
     return Scaffold(
+      drawer: CustomDrawer(),
       appBar: AppBar(
         title: Text('QR Code Generator'),
         actions: <Widget>[],
@@ -159,7 +181,9 @@ class _GeneratePageState extends State<GeneratePage> {
                   padding: EdgeInsets.fromLTRB(40, 20, 40, 0),
                   child: FlatButton(
                     padding: EdgeInsets.all(15.0),
-                    onPressed: () async {},
+                    onPressed: () async {
+                      _downloadData();
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -247,7 +271,7 @@ class _GeneratePageState extends State<GeneratePage> {
       key: _formKey,
       child: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),

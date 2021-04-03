@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pref/pref.dart';
-import 'package:Qrcode/generate.dart';
-import 'package:Qrcode/homePage.dart';
-import 'package:Qrcode/scan.dart';
-import 'package:Qrcode/share_service.dart';
+import 'package:qrcode/generate.dart';
+import 'package:qrcode/homePage.dart';
+import 'package:qrcode/scan.dart';
+import 'package:qrcode/share_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final service = await PrefServiceShared.init(
     defaults: {
       'start_page': 'posts',
-      'ui_theme': 'light',
+      'barcode_type': 'qrcode',
     },
   );
 

@@ -26,15 +26,15 @@ class _MySettingState extends State<MySetting> {
               DropdownMenuItem(value: 'Messages', child: Icon(Icons.message)),
             ],
           ),
-          PrefDropdown<int>(
+          PrefDropdown<String>(
             title: Text('Number of items'),
             pref: 'items_count',
-            fullWidth: false,
+            // fullWidth: false,
             items: [
-              DropdownMenuItem(value: 1, child: Text('One')),
-              DropdownMenuItem(value: 2, child: Text('Two')),
-              DropdownMenuItem(value: 3, child: Text('Three')),
-              DropdownMenuItem(value: 4, child: Text('Four')),
+              DropdownMenuItem(value: 'qrcode', child: Text('QR Code')),
+              DropdownMenuItem(value: '2', child: Text('Two')),
+              DropdownMenuItem(value: '3', child: Text('Three')),
+              DropdownMenuItem(value: '4', child: Text('Four')),
             ],
           ),
           PrefTitle(title: Text('Personalization')),
