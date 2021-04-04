@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
       key: _scaffoldKey,
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text('QR & Barcode Generator Scanner'),
+        title: Text('QR & Barcode'),
         leading: IconButton(
             icon: Icon(Icons.menu),
             onPressed: () => _scaffoldKey.currentState.openDrawer(),),

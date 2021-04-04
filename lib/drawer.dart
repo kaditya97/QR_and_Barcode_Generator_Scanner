@@ -1,6 +1,7 @@
 import 'package:qrcode/homePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qrcode/info.dart';
 import 'package:qrcode/setting.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -75,6 +76,18 @@ class CustomDrawer extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => HomePage()));},
+              ),
+              ListTile(
+                leading: Icon(Icons.info, color: Colors.blue,),
+                title: Text("Barcode Information", style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Myinfo()));},
               ),
               ListTile(
                 leading: Icon(Icons.settings,color: Colors.blue,),

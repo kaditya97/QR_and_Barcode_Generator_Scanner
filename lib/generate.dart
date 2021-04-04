@@ -32,6 +32,7 @@ class _GeneratePageState extends State<GeneratePage> {
   double _panelHeightClosed = 95.0;
   PanelController _pc = new PanelController();
   String dropdownValue = 'qrCode';
+  Barcode _barcode = Barcode.qrCode();
 
   @override
   void initState() {
@@ -41,6 +42,87 @@ class _GeneratePageState extends State<GeneratePage> {
         qrData = sharedText.toString();
       });
     }
+  }
+
+  Barcode _mybarcode() {
+    switch (dropdownValue) {
+      case 'qrCode':
+        _barcode = Barcode.qrCode();
+        break;
+      case 'qrWifi':
+        _barcode = Barcode.qrCode();
+        break;
+      case 'code39':
+        _barcode = Barcode.code39();
+        break;
+      case 'code93':
+        _barcode = Barcode.code93();
+        break;
+      case 'code128a':
+        _barcode = Barcode.code128(useCode128B: false, useCode128C: false);
+        break;
+      case 'code128b':
+        _barcode = Barcode.code128(useCode128A: false, useCode128C: false);
+        break;
+      case 'code128c':
+        _barcode = Barcode.code128(useCode128A: false, useCode128B: false);
+        break;
+      case 'gs1128':
+        _barcode = Barcode.gs128();
+        break;
+      case 'itf14':
+        _barcode = Barcode.itf14();
+        break;
+      case 'itf16':
+        _barcode = Barcode.itf16();
+        break;
+      case 'ean13':
+        _barcode = Barcode.ean13(drawEndChar: true);
+        break;
+      case 'ean8':
+        _barcode = Barcode.ean8(drawSpacers: true);
+        break;
+      case 'ean2':
+        _barcode = Barcode.ean2();
+        break;
+      case 'ean5':
+        _barcode = Barcode.ean5();
+        break;
+      case 'isbn':
+        _barcode = Barcode.isbn(drawEndChar: true);
+        break;
+      case 'upca':
+        _barcode = Barcode.upcA();
+        break;
+      case 'upce':
+        _barcode = Barcode.upcE();
+        break;
+      case 'telepen':
+        _barcode = Barcode.telepen();
+        break;
+      case 'codabar':
+        _barcode = Barcode.codabar(explicitStartStop: true);
+        break;
+      case 'pdf417':
+        _barcode = Barcode.pdf417();
+        break;
+      case 'datamatrix':
+        _barcode = Barcode.dataMatrix();
+        break;
+      case 'aztec':
+        _barcode = Barcode.aztec();
+        break;
+      case 'rm4scc':
+        _barcode = Barcode.rm4scc();
+        break;
+      case 'itf':
+        _barcode = Barcode.itf();
+        break;
+      default:
+        _barcode = Barcode.qrCode();
+        break;
+    }
+    return _barcode;
   }
 
   void shareQrcode(
@@ -54,7 +136,7 @@ class _GeneratePageState extends State<GeneratePage> {
     final box = context.findRenderObject() as RenderBox;
     final directory = (await getExternalStorageDirectory()).path;
     filename ??= bc.name.replaceAll(RegExp(r'\s'), '-').toLowerCase();
-    final image = im.Image(280, 240);
+    final image = im.Image(width ?? 280, height ?? 240);
     im.fill(image, im.getColor(255, 255, 255));
     drawBarcode(image, bc, data, font: im.arial_24);
     File('$directory/$filename.png').writeAsBytesSync(im.encodePng(image));
@@ -65,7 +147,7 @@ class _GeneratePageState extends State<GeneratePage> {
   }
 
   Future<void> _downloadData() async {
-    final bc = Barcode.qrCode();
+    final bc = _mybarcode();
     final image = im.Image(280, 240);
     im.fill(image, im.getColor(255, 255, 255));
     drawBarcode(image, bc, qrData, font: im.arial_48);
@@ -76,7 +158,7 @@ class _GeneratePageState extends State<GeneratePage> {
       bool status = await Permission.storage.isGranted;
       if (!status) await Permission.storage.request();
     }
-    await FileSaver.instance.saveFile("myqr", bytes, "png", mimeType:type);
+    await FileSaver.instance.saveFile("myqr", bytes, "png", mimeType: type);
     final snackBar = SnackBar(content: Text('Image Downloaded'));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
@@ -108,30 +190,10 @@ class _GeneratePageState extends State<GeneratePage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    BarcodeWidget(
-                      barcode: Barcode.qrCode(
-                        errorCorrectLevel: BarcodeQRCorrectionLevel.high,
-                      ),
-                      data: qrData,
-                      width: 200,
-                      height: 200,
-                    ),
-                    Container(
-                      color: Colors.white,
-                      width: 30,
-                      height: 30,
-                      child: const FlutterLogo(),
-                    ),
-                  ],
+                BarcodeWidget(
+                  barcode: _barcode,
+                  data: qrData,
                 ),
-
-                // BarcodeWidget(
-                //   barcode: Barcode.qrCode(),
-                //   data: qrData,
-                // ),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -148,7 +210,7 @@ class _GeneratePageState extends State<GeneratePage> {
                     padding: EdgeInsets.all(15.0),
                     onPressed: () async {
                       shareQrcode(
-                        Barcode.qrCode(),
+                        _mybarcode(),
                         qrData,
                         height: 200,
                         filename: "QRExample",
@@ -305,7 +367,7 @@ class _GeneratePageState extends State<GeneratePage> {
                   ),
                   DropdownMenuItem(
                     child: Text("Code 93"),
-                    value: 'code 93',
+                    value: 'code93',
                   ),
                   DropdownMenuItem(
                     child: Text("Code 128A"),
@@ -409,6 +471,7 @@ class _GeneratePageState extends State<GeneratePage> {
                   } else {
                     setState(() {
                       qrData = qrdataFeed.text;
+                      _barcode = _mybarcode();
                     });
                   }
                   FocusScope.of(context).requestFocus(FocusNode());
